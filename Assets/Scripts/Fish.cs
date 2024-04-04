@@ -8,6 +8,7 @@ public class Fish : ScriptableObject
     public new string name;
     public Sprite sprite;
     public int health;
+
     public float physicalDefense;
     public float magicalDefense;
     public float evasion;
