@@ -19,6 +19,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Vector2 movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
-        rb.MovePosition(movement * Time.deltaTime * movementSpeed);
+        rb.AddForce(movement * Time.deltaTime * movementSpeed, ForceMode.Impulse);
     }
 }

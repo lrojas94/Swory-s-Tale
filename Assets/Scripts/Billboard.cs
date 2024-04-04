@@ -4,8 +4,17 @@ using UnityEngine;
 
 public class Billboard : MonoBehaviour
 {
+    [SerializeField]
+    private bool freezeXZAxis = true;
     private void Update()
     {
-        transform.LookAt(Camera.main.transform.position);
+        if (freezeXZAxis)
+        {
+            transform.rotation = Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f);
+        } else
+        {
+            transform.rotation = Camera.main.transform.rotation;
+
+        }
     }
 }
