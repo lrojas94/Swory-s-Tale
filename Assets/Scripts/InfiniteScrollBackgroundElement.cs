@@ -7,11 +7,17 @@ using UnityEngine;
 public class InfiniteScrollBackgroundElement : MonoBehaviour
 {
     [SerializeField]
+    private bool generateOnAwake = false;
+    [SerializeField]
     private ScrollableBackground scrollableBackground;
+    [SerializeField]
     private List<GameObject> instances;
     void Awake()
     {
-        GenerateSprites();
+        if (generateOnAwake)
+        {        
+            GenerateSprites();
+        }
     }
 
     // Update is called once per frame
@@ -38,7 +44,7 @@ public class InfiniteScrollBackgroundElement : MonoBehaviour
         }
     }
 
-    void GenerateSprites()
+    public void GenerateSprites()
     {
 
         var sprite = scrollableBackground.sprite;
