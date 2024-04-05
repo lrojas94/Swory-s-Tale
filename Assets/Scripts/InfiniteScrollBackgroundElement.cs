@@ -24,11 +24,12 @@ public class InfiniteScrollBackgroundElement : MonoBehaviour
             for (var i = 0;  i < instances.Count; i++)
             {
                 var instance = instances[i];
-                var screnPos = Camera.main.WorldToScreenPoint(instance.transform.position);
-                if (screnPos.x + 4 * (sprite.bounds.size.x * sprite.pixelsPerUnit) < 0)
+                var screenPos = Camera.main.WorldToScreenPoint(instance.transform.position);
+                if (screenPos.x + 2 * (sprite.bounds.size.x * sprite.pixelsPerUnit) < 0)
                 {
+                    Debug.Log($"{screenPos.x} .. {sprite.rect.size.x} .. {sprite.bounds.size}");
                     var lastInstance = instances.Last();
-                    instance.transform.position = new Vector3(lastInstance.transform.position.x + 1 + (scrollableBackground.offset / sprite.pixelsPerUnit), transform.position.y, transform.position.z);
+                    instance.transform.position = new Vector3(lastInstance.transform.position.x + (1 * scrollableBackground.scale) + (scrollableBackground.offset / sprite.pixelsPerUnit), transform.position.y, transform.position.z);
                     instances.RemoveAt(i);
                     instances.Add(instance);
                     i--;
@@ -42,24 +43,29 @@ public class InfiniteScrollBackgroundElement : MonoBehaviour
 
         var sprite = scrollableBackground.sprite;
         var screenWidth = Screen.width;
-        var spriteWidth = sprite.bounds.size.x * sprite.pixelsPerUnit;
+        var spriteWidth = sprite.bounds.size.x * sprite.pixelsPerUnit * scrollableBackground.scale;
         var test =  Mathf.Tan(Mathf.Rad2Deg * Camera.main.fieldOfView / 2) * Mathf.Abs(Vector3.Distance(transform.position,Camera.main.transform.position));
         Debug.Log(test);
-        var spriteCount = (int)(Mathf.Ceil(screenWidth / spriteWidth));
+        var spriteCount = 2 * (int)(Mathf.Ceil(screenWidth / spriteWidth));
 
         instances = new List<GameObject>();
 
         
-        for (var i = -spriteCount; i < spriteCount; i++)
+        for (var i = -spriteCount; i <= spriteCount; i++)
         {
             // instantiate this amount of prefabs:
             GameObject instance = new GameObject(scrollableBackground.name);
             instance.transform.parent = transform;
+            if (scrollableBackground.scale > 1)
+            {
+                instance.transform.localScale = new Vector3(scrollableBackground.scale, scrollableBackground.scale, scrollableBackground.scale);
+            }
+
             SpriteRenderer renderer = instance.AddComponent<SpriteRenderer>();
             ScrollWithGame scrollWithGame = instance.AddComponent<ScrollWithGame>();
             scrollWithGame.scrollSpeed = scrollableBackground.scrollSpeed;
             renderer.sprite = sprite;
-            instance.transform.position = new Vector3(i + (scrollableBackground.offset / sprite.pixelsPerUnit), transform.position.y, transform.position.z);
+            instance.transform.position = new Vector3(i * scrollableBackground.scale + (scrollableBackground.offset / sprite.pixelsPerUnit), transform.position.y, transform.position.z);
             instances.Add(instance);
         }
     }

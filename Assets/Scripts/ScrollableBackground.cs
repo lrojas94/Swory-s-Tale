@@ -10,4 +10,5 @@ public class ScrollableBackground: ScriptableObject
     public Sprite sprite;
     public float scrollSpeed = 1;
     public float offset = 0;
+    public float scale = 1f;
 }
