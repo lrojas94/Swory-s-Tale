@@ -6,7 +6,6 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    private float movementSpeed = 1f;
     Animator animator;
 
     [SerializeField]
@@ -22,15 +21,5 @@ public class PlayerController : MonoBehaviour
         }
         animator = GetComponent<Animator>();    
         character.UpdatePlayerState(CharacterState.Walking);
-    }
-
-    // Update is called once per frame
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        Debug.Log("Oh no");
-        if (collision.CompareTag("Enemy"))
-        {
-            GameController.Instance.EnemyEncounter(character, collision.gameObject.GetComponent<CharacterBase>());
-        }
     }
 }

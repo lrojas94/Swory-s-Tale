@@ -31,7 +31,7 @@ public class InfiniteScrollBackgroundElement : MonoBehaviour
             {
                 var instance = instances[i];
                 var screenPos = Camera.main.WorldToScreenPoint(instance.transform.position);
-                if (screenPos.x + 2 * (sprite.bounds.size.x * sprite.pixelsPerUnit) < 0)
+                if (screenPos.x + 4 * (sprite.bounds.size.x * sprite.pixelsPerUnit) < 0)
                 {
                     Debug.Log($"{screenPos.x} .. {sprite.rect.size.x} .. {sprite.bounds.size}");
                     var lastInstance = instances.Last();

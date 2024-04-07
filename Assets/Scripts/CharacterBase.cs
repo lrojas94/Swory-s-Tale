@@ -15,6 +15,13 @@ public enum CharacterState
     Dead = 6
 }
 
+public enum CharacterAction
+{
+    Attack = 0,
+    Defend = 1,
+    Spell = 2,
+}
+
 [Serializable]
 public struct CharacterAnimation
 {
@@ -29,6 +36,11 @@ public class CharacterBase : MonoBehaviour
     [SerializeField]
     private CharacterAnimation[] characterAnimationMap;
     public CharacterState state = CharacterState.Idle;
+    private int health = 100;
+
+    [SerializeField]
+    private CharacterAction[] actionPattern;
+    private int actionPatternIndex;
 
     private Animator animator;
 
@@ -43,6 +55,28 @@ public class CharacterBase : MonoBehaviour
         UpdatePlayerState(state);
     }
 
+    public void PerformNextAction()
+    {
+        PerformAction(actionPattern[actionPatternIndex]);
+        actionPatternIndex++;
+
+        if (actionPatternIndex == actionPattern.Length)
+        {
+            actionPatternIndex = 0;
+        }
+    }
+
+    public void PerformAction(CharacterAction action)
+    {
+        CharacterState newState = action == CharacterAction.Attack ? CharacterState.Attacking
+            : action == CharacterAction.Defend ? CharacterState.Defending
+            : action == CharacterAction.Spell ? CharacterState.LaunchingSpell
+            : CharacterState.Idle;
+
+        UpdatePlayerState(newState);
+    }
+
+
     public void UpdatePlayerState(CharacterState state)
     {
         this.state = state;
@@ -53,6 +87,18 @@ public class CharacterBase : MonoBehaviour
         {
             animator.Play(animation.Value.animationName);
         }
-        
     }
+
+    public bool DamageCharacter(int damage)
+    {
+        health -= damage;
+
+        if (health <= 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
 }

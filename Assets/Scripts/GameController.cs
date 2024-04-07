@@ -1,18 +1,32 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 public enum GameStatus
 {
     Scrolling = 0,
-    Fighting = 1
+    SelectingPlayerAction = 1,
+    ProcessingAnimation = 2,
+    PlayerDead = 3
 }
 
 public class GameController : MonoBehaviour
 {
     public static GameController Instance { get; private set; }
+    public event Action<GameStatus> OnGameStatusChange;
 
+    public GameObject PlayerMovementSelector;
     public GameStatus status;
+
+    private CharacterBase activePlayer;
+    private CharacterBase activeEnemy;
+
+    [SerializeField]
+    private CinemachineVirtualCamera playerCamera;
+    [SerializeField]
+    private CinemachineVirtualCamera battleCamera;
 
     private void Awake()
     {
@@ -27,25 +41,31 @@ public class GameController : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void EnemyEncounter(CharacterBase player, CharacterBase enemy, Transform encounterTransform)
     {
-        if (status == GameStatus.Scrolling)
-        {
-            ScrollWorld();
-        } 
-    }
-
-    void ScrollWorld()
-    {
-        
-    }
-
-    public void EnemyEncounter(CharacterBase player, CharacterBase enemy)
-    {
-        status = GameStatus.Fighting;
+        status = GameStatus.SelectingPlayerAction;
         player.UpdatePlayerState(CharacterState.Idle);
         enemy.UpdatePlayerState(CharacterState.Idle);
+        OnGameStatusChange?.Invoke(status);
+        PlayerMovementSelector.SetActive(true);
 
+        activePlayer = player;
+        activeEnemy = enemy;
+
+        playerCamera.Priority = 1;
+        battleCamera.Priority = 2;
+        battleCamera.Follow = encounterTransform;
+    }
+
+    
+
+    public void SelectPlayerMove(int playerAction)
+    {
+
+        Debug.Log($"Player selected {playerAction}");
+        status = GameStatus.ProcessingAnimation;
+        activePlayer.PerformAction((CharacterAction) playerAction);
+        activeEnemy.PerformNextAction();
+        PlayerMovementSelector.SetActive(false);
     }
 }
