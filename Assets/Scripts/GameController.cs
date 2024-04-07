@@ -40,4 +40,12 @@ public class GameController : MonoBehaviour
     {
         
     }
+
+    public void EnemyEncounter(CharacterBase player, CharacterBase enemy)
+    {
+        status = GameStatus.Fighting;
+        player.UpdatePlayerState(CharacterState.Idle);
+        enemy.UpdatePlayerState(CharacterState.Idle);
+
+    }
 }
