@@ -29,13 +29,24 @@ public struct CharacterAnimation
     public string animationName;
 }
 
+[Serializable]
+public struct CharacterActionDefinition
+{
+    public CharacterAction action;
+    public GameObject prefab;
+    public Transform instantiateFrom;
+}
+
 
 public class CharacterBase : MonoBehaviour
 {
-
+    public CharacterState state = CharacterState.Idle;
+ 
     [SerializeField]
     private CharacterAnimation[] characterAnimationMap;
-    public CharacterState state = CharacterState.Idle;
+    [SerializeField]
+    private CharacterActionDefinition[] characterActionDefinitionMap;
+    [SerializeField]
     private int health = 100;
 
     [SerializeField]
@@ -43,6 +54,9 @@ public class CharacterBase : MonoBehaviour
     private int actionPatternIndex;
 
     private Animator animator;
+
+    [SerializeField]
+    private GameObject floatingTextPrefab;
 
     // Start is called before the first frame update
     void Awake()
@@ -93,6 +107,11 @@ public class CharacterBase : MonoBehaviour
     {
         health -= damage;
 
+        if (floatingTextPrefab != null)
+        {
+            Instantiate(floatingTextPrefab, transform.position, Quaternion.identity);
+        }
+
         if (health <= 0)
         {
             return true;
@@ -101,4 +120,14 @@ public class CharacterBase : MonoBehaviour
         return false;
     }
 
+    public void TriggerActionPrefab(CharacterAction action)
+    {
+        CharacterActionDefinition? characterActionDefinition = characterActionDefinitionMap.FirstOrDefault(item => item.action == action);
+        
+        if (characterActionDefinition.HasValue && characterActionDefinition.Value.prefab != null)
+        {
+            GameObject instance = GameObject.Instantiate(characterActionDefinition.Value.prefab);
+            instance.transform.position = characterActionDefinition.Value.instantiateFrom.position;
+        }
+    }
 }
