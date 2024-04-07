@@ -2067,7 +2067,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.7489526, y: 0.00000011920929, z: -10}
+  m_LocalPosition: {x: 1.7497776, y: 0.00000011920929, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3058,9 +3058,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 1
   characterAnimationMap:
+  - state: 0
+    animationName: Player_Walk
   - state: 1
     animationName: Player_Idle
-  characterActionDefinitionMap: []
+  - state: 2
+    animationName: Player_Attack
+  - state: 3
+    animationName: Player_Defend
+  - state: 4
+    animationName: Player_Spell
+  characterActionDefinitionMap:
+  - action: 0
+    prefab: {fileID: 0}
+    instantiateFrom: {fileID: 1097440909}
+  - action: 1
+    prefab: {fileID: 0}
+    instantiateFrom: {fileID: 63974578}
+  - action: 2
+    prefab: {fileID: 0}
+    instantiateFrom: {fileID: 1097440909}
   health: 100
   actionPattern: 0000000001000000
   floatingTextPrefab: {fileID: 0}
@@ -3498,7 +3515,7 @@ Transform:
   m_GameObject: {fileID: 1398912036}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.7489526, y: 0.00000011920929, z: -10}
+  m_LocalPosition: {x: 1.7497776, y: 0.00000011920929, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4264,8 +4281,8 @@ SceneRoots:
   - {fileID: 1517840872}
   - {fileID: 636279300}
   - {fileID: 1058722232}
-  - {fileID: 824204558}
   - {fileID: 1718375300}
   - {fileID: 643678572}
   - {fileID: 1763581660}
   - {fileID: 867933794}
+  - {fileID: 824204558}
