@@ -51,6 +51,10 @@ public class CharacterBase : MonoBehaviour
     private CharacterActionDefinition[] characterActionDefinitionMap;
     [SerializeField]
     private int health = 100;
+    [SerializeField]
+    private int maxHealth = 100;
+    [SerializeField]
+    private HealthBar healthBar;
 
 
     public bool isDead
@@ -79,6 +83,12 @@ public class CharacterBase : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        if (healthBar == null)
+        {
+            healthBar = GetComponent<HealthBar>();
+        }
+
+        health = maxHealth;
     }
 
     void Start()
@@ -141,7 +151,12 @@ public class CharacterBase : MonoBehaviour
 
     public bool TakeDamage(int damage)
     {
+        
         health -= damage;
+        if (healthBar != null)
+        {
+            healthBar.UpdateHealthBar(maxHealth, health);
+        }
         DamagePopup.ShowDamage(damage, transform.position);
 
         if (floatingTextPrefab != null)
