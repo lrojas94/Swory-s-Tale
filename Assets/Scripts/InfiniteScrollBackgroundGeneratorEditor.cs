@@ -1,4 +1,5 @@
 
+#if EDITOR
 
 using UnityEngine;
 using UnityEditor;
@@ -19,3 +20,5 @@ public class InfiniteScrollBackgroundGeneratorEditor : Editor
 
     }
 }
+
+#endif

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum CharacterState
@@ -40,8 +42,9 @@ public struct CharacterActionDefinition
 
 public class CharacterBase : MonoBehaviour
 {
+    public bool isPlayer = false;
     public CharacterState state = CharacterState.Idle;
- 
+    
     [SerializeField]
     private CharacterAnimation[] characterAnimationMap;
     [SerializeField]
@@ -49,11 +52,23 @@ public class CharacterBase : MonoBehaviour
     [SerializeField]
     private int health = 100;
 
+
+    public bool isDead
+    {
+        get
+        {
+            return this.health <= 0;
+        }
+    }
+
+
     [SerializeField]
     private CharacterAction[] actionPattern;
     private int actionPatternIndex;
 
     private Animator animator;
+    private Rigidbody2D rb;
+    private SpriteRenderer sr;
 
     [SerializeField]
     private GameObject floatingTextPrefab;
@@ -62,6 +77,8 @@ public class CharacterBase : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     void Start()
@@ -71,6 +88,7 @@ public class CharacterBase : MonoBehaviour
 
     public void PerformNextAction()
     {
+        Debug.Log($"Performing {actionPattern[actionPatternIndex]}");
         PerformAction(actionPattern[actionPatternIndex]);
         actionPatternIndex++;
 
@@ -97,15 +115,34 @@ public class CharacterBase : MonoBehaviour
         
         CharacterAnimation? animation = characterAnimationMap.FirstOrDefault(pair => pair.state == state);
 
-        if (animation.HasValue)
+        if (animation.HasValue && animator != null)
         {
             animator.Play(animation.Value.animationName);
         }
+
+        if (state == CharacterState.Dead)
+        {
+            // Go ahead and kill the player:
+            if (rb == null)
+            {
+                rb = this.AddComponent<Rigidbody2D>();
+            }
+
+            rb.mass = 1;
+            rb.gravityScale = 1;
+            rb.AddForce(new Vector2(isPlayer ? -1 : 1, 3), ForceMode2D.Impulse);
+            rb.constraints = RigidbodyConstraints2D.None;
+            Collider2D[] colliders = new Collider2D[rb.attachedColliderCount];
+            rb.GetAttachedColliders(colliders);
+            foreach(Collider2D collider in colliders) { collider.enabled = false; }
+            StartCoroutine(RotateAndFade());
+        }
     }
 
-    public bool DamageCharacter(int damage)
+    public bool TakeDamage(int damage)
     {
         health -= damage;
+        DamagePopup.ShowDamage(damage, transform.position);
 
         if (floatingTextPrefab != null)
         {
@@ -114,6 +151,7 @@ public class CharacterBase : MonoBehaviour
 
         if (health <= 0)
         {
+            UpdatePlayerState(CharacterState.Dead);
             return true;
         }
 
@@ -128,6 +166,44 @@ public class CharacterBase : MonoBehaviour
         {
             GameObject instance = GameObject.Instantiate(characterActionDefinition.Value.prefab);
             instance.transform.position = characterActionDefinition.Value.instantiateFrom.position;
+            CharacterAttack characterAttack = instance.GetComponent<CharacterAttack>();
+            characterAttack.IsPlayerAttack = isPlayer;
+            characterAttack.SourceIsPlayer = isPlayer;
+            int layer = isPlayer ? LayerMask.NameToLayer("PlayerAttack") : LayerMask.NameToLayer("EnemyAttack");
+            instance.layer = layer;
+            foreach (Transform child in instance.transform)
+            {
+                child.gameObject.layer = layer;
+            }
         }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            UpdatePlayerState(CharacterState.Dead);
+        } 
+    }
+
+    IEnumerator RotateAndFade()
+    {
+        Color c = sr.color;
+        Debug.Log(sr.color);
+        float fadeSpeed = 0.5f;
+        float rotateSpeed = 300f;
+        Debug.Log(c.a);
+
+        while(c.a > 0)
+        {
+            c.a -= fadeSpeed * Time.deltaTime;
+            Vector3 rotation = transform.rotation.eulerAngles;
+            rotation  += new Vector3(0, 0, -rotateSpeed * Time.deltaTime);
+            Debug.Log(rotation);
+            transform.rotation = Quaternion.Euler(rotation);
+            sr.color = c;
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 }

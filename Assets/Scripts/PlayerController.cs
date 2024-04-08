@@ -21,5 +21,6 @@ public class PlayerController : MonoBehaviour
         }
         animator = GetComponent<Animator>();    
         character.UpdatePlayerState(CharacterState.Walking);
+        character.isPlayer = true;
     }
 }
